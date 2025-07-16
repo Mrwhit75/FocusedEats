@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOCUSED EATS</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F8F0; /* Dutch White */
+            color: #2F4F4F; /* Darker tone for text */
+        }
+        .bg-dutch-white {
+            background-color: #F8F8F0; /* Dutch White */
+        }
+        .bg-light-blue {
+            background-color: #E0F2F7; /* Very Light Blue */
+        }
+        .bg-medium-blue {
+            background-color: #B2EBF2; /* Medium Light Blue */
+        }
+        .text-dark-blue {
+            color: #00796B; /* Dark Teal for contrast */
+        }
+        .text-light-blue-darker {
+            color: #2F4F4F; /* Dark Slate Gray for main text */
+        }
+        .border-light-blue {
+            border-color: #B2EBF2;
+        }
+        .shadow-light-blue {
+            box-shadow: 0 4px 6px -1px rgba(178, 235, 242, 0.5), 0 2px 4px -1px rgba(178, 235, 242, 0.3);
+        }
+
+        /* Spinning Plate Animation */
+        .spinning-plate {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: conic-gradient(#B2EBF2 0% 25%, #81C784 25% 50%, #FFD54F 50% 75%, #F06292 75% 100%);
+            animation: spin 2s linear infinite;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinning-plate::before {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #F8F8F0; /* Dutch White */
+            z-index: 1;
+        }
+
+        .spinning-plate-text {
+            position: absolute;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #2F4F4F;
+            z-index: 2;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Red Flag Emoji Styling */
+        .red-flag-emoji::before {
+            content: "🚩 "; /* Red flag emoji */
+        }
+
+        /* Medical Alert Styling */
+        .medical-alert {
+            background-color: #FEE2E2;
+            border: 2px solid #EF4444;
+            color: #DC2626;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        /* Error Message Styling */
+        .error-message {
+            background-color: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: #DC2626;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        /* Success Message Styling */
+        .success-message {
+            background-color: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            color: #059669;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #00796B;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin: 0.5rem;
+            }
+            #feedback-btn {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen items-center justify-center p-4 bg-dutch-white text-light-blue-darker">
+
+    <!-- Logout Button (Initially hidden, shown after login) -->
+    <button id="logout-btn" class="hidden absolute top-4 right-4 bg-medium-blue text-dark-blue px-4 py-2 rounded-lg shadow-md hover:bg-blue-300 transition duration-300 text-sm font-semibold">
+        Logout
+    </button>
+
+    <!-- Signup Section (Initially visible) -->
+    <div id="signup-section" class="bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-md w-full">
+        <h2 class="text-3xl font-bold text-center text-dark-blue mb-6">Create Your FocusedEats Account</h2>
+        <form id="signup-form" class="space-y-4">
+            <div>
+                <label for="signup-fullname" class="block text-sm font-medium text-light-blue-darker mb-1">Full Name</label>
+                <input type="text" id="signup-fullname" name="fullname" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Your full name" required>
+            </div>
+            <div>
+                <label for="signup-username" class="block text-sm font-medium text-light-blue-darker mb-1">Username</label>
+                <input type="text" id="signup-username" name="username" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Choose a username" required>
+            </div>
+            <div>
+                <label for="signup-password" class="block text-sm font-medium text-light-blue-darker mb-1">Password</label>
+                <input type="password" id="signup-password" name="password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Create a password" required minlength="6">
+            </div>
+            <div>
+                <label for="signup-age" class="block text-sm font-medium text-light-blue-darker mb-1">Age</label>
+                <input type="number" id="signup-age" name="age" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Your age" min="1" max="120" required>
+            </div>
+            <div>
+                <label for="signup-gender" class="block text-sm font-medium text-light-blue-darker mb-1">Gender</label>
+                <select id="signup-gender" name="gender" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div id="signup-error" class="error-message hidden"></div>
+            <button type="submit" class="w-full bg-dark-blue text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-md">Sign Up</button>
+            <p class="text-center text-sm text-light-blue-darker">Already have an account? <a href="#" id="show-login-link" class="text-dark-blue hover:underline">Login here</a></p>
+        </form>
+    </div>
+
+    <!-- Login Section (Hidden by default) -->
+    <div id="login-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-md w-full">
+        <h2 class="text-3xl font-bold text-center text-dark-blue mb-6">Welcome Back to FocusedEats!</h2>
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label for="login-username" class="block text-sm font-medium text-light-blue-darker mb-1">Username</label>
+                <input type="text" id="login-username" name="username" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Enter your username" required>
+            </div>
+            <div>
+                <label for="login-password" class="block text-sm font-medium text-light-blue-darker mb-1">Password</label>
+                <input type="password" id="login-password" name="password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Enter your password" required>
+            </div>
+            <div class="flex items-center">
+                <input type="checkbox" id="remember-me" name="remember-me" class="h-4 w-4 text-dark-blue rounded focus:ring-dark-blue">
+                <label for="remember-me" class="ml-2 block text-sm text-light-blue-darker">Remember me</label>
+            </div>
+            <div id="login-error" class="error-message hidden"></div>
+            <button type="submit" class="w-full bg-dark-blue text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-md">Login</button>
+            <p class="text-center text-sm text-light-blue-darker">Don't have an account? <a href="#" id="show-signup-link" class="text-dark-blue hover:underline">Sign up here</a></p>
+        </form>
+    </div>
+
+    <!-- Dashboard Section (Hidden by default) -->
+    <div id="dashboard-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-2xl w-full">
+        <h2 id="welcome-message" class="text-3xl font-bold text-center text-dark-blue mb-6">Welcome to FocusedEats! Ready to create your personalized meal plan?</h2>
+
+        <div class="space-y-6">
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h3 class="text-xl font-semibold text-dark-blue mb-4">Morning Health Readings</h3>
+                <form id="health-form" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="weight" class="block text-sm font-medium text-light-blue-darker mb-1">Weight (kg)</label>
+                            <input type="number" step="0.1" id="weight" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue" placeholder="e.g., 75.5" required min="20" max="300">
+                        </div>
+                        <div>
+                            <label for="bp-systolic" class="block text-sm font-medium text-light-blue-darker mb-1">Blood Pressure (Systolic)</label>
+                            <input type="number" id="bp-systolic" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue" placeholder="e.g., 120" required min="70" max="250">
+                        </div>
+                        <div>
+                            <label for="bp-diastolic" class="block text-sm font-medium text-light-blue-darker mb-1">Blood Pressure (Diastolic)</label>
+                            <input type="number" id="bp-diastolic" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue" placeholder="e.g., 80" required min="40" max="150">
+                        </div>
+                        <div>
+                            <label for="blood-sugar" class="block text-sm font-medium text-light-blue-darker mb-1">Blood Sugar (mg/dL)</label>
+                            <input type="number" step="0.1" id="blood-sugar" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue" placeholder="e.g., 95.2" required min="40" max="600">
+                        </div>
+                    </div>
+                    <div id="health-error" class="error-message hidden"></div>
+                    <div id="medical-alert" class="medical-alert hidden">
+                        <strong>⚠️ Medical Alert:</strong> Your readings are outside normal ranges. Please consult a healthcare professional before proceeding.
+                    </div>
+                    <button type="submit" id="generate-plan-btn" class="w-full bg-dark-blue text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-md">Generate Personalized Meal Plan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Section (Hidden by default) -->
+    <div id="processing-section" class="hidden flex flex-col items-center justify-center p-8 rounded-xl bg-dutch-white">
+        <div class="spinning-plate mb-4">
+            <span class="spinning-plate-text">🍽️</span>
+        </div>
+        <p class="text-lg text-light-blue-darker font-medium">Analyzing your health metrics and generating your personalized meal plan...</p>
+    </div>
+
+    <!-- Meal Plan Display Section (Hidden by default) -->
+    <div id="meal-plan-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-3xl w-full">
+        <h2 class="text-3xl font-bold text-center text-dark-blue mb-6">Your Personalized FocusedEats Meal Plan</h2>
+
+        <div id="health-summary" class="bg-light-blue p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold text-dark-blue mb-2">Health Analysis Summary</h3>
+            <div id="health-analysis" class="text-sm text-light-blue-darker">
+                <!-- Health analysis will be inserted here -->
+            </div>
+        </div>
+
+        <div id="meal-details" class="space-y-6 mb-8">
+            <!-- Meal details will be dynamically inserted here -->
+        </div>
+
+        <div id="foods-to-avoid" class="bg-red-50 border border-red-200 p-4 rounded-lg shadow-sm">
+            <h3 class="text-xl font-semibold text-red-700 mb-3">Foods to Avoid Today</h3>
+            <ul class="list-disc pl-5 space-y-2 text-red-600">
+                <!-- Foods to avoid will be dynamically inserted here -->
+            </ul>
+        </div>
+
+        <div class="mt-6 flex gap-4">
+            <button id="save-plan-btn" class="flex-1 bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300 shadow-md">Save This Plan</button>
+            <button id="new-plan-btn" class="flex-1 bg-dark-blue text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-md">Generate New Plan</button>
+        </div>
+    </div>
+
+    <!-- Weekly Progress Section (Hidden by default, accessible via button) -->
+    <div id="progress-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-3xl w-full mt-4">
+        <h2 class="text-3xl font-bold text-center text-dark-blue mb-6">Your Weekly Progress Report</h2>
+        <div id="progress-data" class="bg-light-blue p-4 rounded-lg text-center text-light-blue-darker">
+            <p class="mb-2">Your saved meal plans and health trends:</p>
+            <div id="progress-chart" class="w-full h-48 bg-gray-200 rounded-md flex items-center justify-center text-gray-500">
+                [Progress data will be displayed here]
+            </div>
+        </div>
+        <button id="my-progress-btn" class="mt-6 w-full bg-dark-blue text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-md">View All Saved Plans</button>
+    </div>
+
+    <!-- Feedback Button (Always visible at the bottom) -->
+    <button id="feedback-btn" class="fixed bottom-4 right-4 bg-medium-blue text-dark-blue p-4 rounded-full shadow-lg hover:bg-blue-300 transition duration-300 flex items-center justify-center text-sm font-semibold">
+        Feedback
+    </button>
+
+    <script>
+        // UI State Management
+        const signupSection = document.getElementById('signup-section');
+        const loginSection = document.getElementById('login-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const processingSection = document.getElementById('processing-section');
+        const mealPlanSection = document.getElementById('meal-plan-section');
+        const progressSection = document.getElementById('progress-section');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const mealDetails = document.getElementById('meal-details');
+        const foodsToAvoidList = document.querySelector('#foods-to-avoid ul');
+        const logoutBtn = document.getElementById('logout-btn');
+        const healthAnalysis = document.getElementById('health-analysis');
+
+        // User data storage with localStorage
+        let currentUser = null;
+        let savedPlans = [];
+
+        // Load saved data from localStorage
+        function loadSavedData() {
+            const savedUser = localStorage.getItem('focusedEatsUser');
+            const savedPlansData = localStorage.getItem('focusedEatsPlans');
+            
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+            }
+            if (savedPlansData) {
+                savedPlans = JSON.parse(savedPlansData);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            if (currentUser) {
+                localStorage.setItem('focusedEatsUser', JSON.stringify(currentUser));
+            }
+            localStorage.setItem('focusedEatsPlans', JSON.stringify(savedPlans));
+        }
+
+        // Function to show/hide sections
+        function showSection(sectionToShow) {
+            signupSection.classList.add('hidden');
+            loginSection.classList.add('hidden');
+            dashboardSection.classList.add('hidden');
+            processingSection.classList.add('hidden');
+            mealPlanSection.classList.add('hidden');
+            progressSection.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+
+            sectionToShow.classList.remove('hidden');
+
+            if (sectionToShow !== signupSection && sectionToShow !== loginSection && currentUser) {
+                logoutBtn.classList.remove('hidden');
+            }
+        }
+
+        // Show error message
+        function showError(containerId, message) {
+            const errorDiv = document.getElementById(containerId);
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
+        // Hide error message
+        function hideError(containerId) {
+            const errorDiv = document.getElementById(containerId);
+            errorDiv.classList.add('hidden');
+        }
+
+        // Health analysis function
+        function analyzeHealthMetrics(weight, systolic, diastolic, bloodSugar) {
+            const analysis = {
+                weight: { status: 'normal', message: '', recommendations: [] },
+                bloodPressure: { status: 'normal', message: '', recommendations: [] },
+                bloodSugar: { status: 'normal', message: '', recommendations: [] },
+                overallRisk: 'low'
+            };
+
+            // Weight analysis (simplified BMI calculation)
+            const heightCm = 170; // Assuming average height for demo
+            const heightM = heightCm / 100;
+            const bmi = weight / (heightM * heightM);
+
+            if (bmi < 18.5) {
+                analysis.weight.status = 'underweight';
+                analysis.weight.message = 'Your BMI indicates you are underweight.';
+                analysis.weight.recommendations = ['Increase caloric intake with nutrient-dense foods', 'Include healthy fats in your diet', 'Consider consulting a nutritionist'];
+            } else if (bmi >= 25) {
+                analysis.weight.status = 'overweight';
+                analysis.weight.message = 'Your BMI indicates you are overweight.';
+                analysis.weight.recommendations = ['Focus on portion control', 'Increase physical activity', 'Choose lower-calorie, high-fiber foods'];
+            }
+
+            // Blood pressure analysis
+            if (systolic >= 140 || diastolic >= 90) {
+                analysis.bloodPressure.status = 'high';
+                analysis.bloodPressure.message = 'Your blood pressure is elevated.';
+                analysis.bloodPressure.recommendations = ['Reduce sodium intake', 'Increase potassium-rich foods', 'Consider DASH diet principles'];
+                analysis.overallRisk = 'medium';
+            } else if (systolic >= 120 || diastolic >= 80) {
+                analysis.bloodPressure.status = 'elevated';
+                analysis.bloodPressure.message = 'Your blood pressure is slightly elevated.';
+                analysis.bloodPressure.recommendations = ['Monitor sodium intake', 'Increase physical activity', 'Maintain healthy weight'];
+            }
+
+            // Blood sugar analysis
+            if (bloodSugar >= 126) {
+                analysis.bloodSugar.status = 'high';
+                analysis.bloodSugar.message = 'Your blood sugar is elevated.';
+                analysis.bloodSugar.recommendations = ['Limit refined carbohydrates', 'Choose complex carbs', 'Monitor portion sizes'];
+                analysis.overallRisk = 'medium';
+            } else if (bloodSugar < 70) {
+                analysis.bloodSugar.status = 'low';
+                analysis.bloodSugar.message = 'Your blood sugar is low.';
+                analysis.bloodSugar.recommendations = ['Eat regular meals', 'Include complex carbohydrates', 'Avoid skipping meals'];
+            }
+
+            return analysis;
+        }
+
+        // Generate personalized meal plan
+        function generateMealPlan(analysis) {
+            const meals = {
+                breakfast: { name: '', calories: 0, reason: '' },
+                lunch: { name: '', calories: 0, reason: '' },
+                dinner: { name: '', calories: 0, reason: '' },
+                snack: { name: '', calories: 0, reason: '' }
+            };
+
+            const foodsToAvoid = [];
+
+            // Personalized meal recommendations based on health analysis
+            if (analysis.overallRisk === 'low') {
+                meals.breakfast = {
+                    name: 'Oatmeal with berries and nuts',
+                    calories: 350,
+                    reason: 'Balanced breakfast with fiber and antioxidants for stable energy'
+                };
+                meals.lunch = {
+                    name: 'Grilled chicken salad with mixed greens',
+                    calories: 450,
+                    reason: 'Lean protein with vegetables for sustained energy and nutrients'
+                };
+                meals.dinner = {
+                    name: 'Baked salmon with steamed vegetables and quinoa',
+                    calories: 550,
+                    reason: 'Omega-3 rich fish with complex carbohydrates for heart health'
+                };
+                meals.snack = {
+                    name: 'Apple slices with almonds',
+                    calories: 150,
+                    reason: 'Fiber-rich snack with healthy fats for satiety'
+                };
+            } else {
+                // More restrictive meal plan for higher risk
+                meals.breakfast = {
+                    name: 'Greek yogurt with berries and chia seeds',
+                    calories: 300,
+                    reason: 'High protein, low sugar breakfast for blood sugar control'
+                };
+                meals.lunch = {
+                    name: 'Turkey and avocado wrap with side salad',
+                    calories: 400,
+                    reason: 'Lean protein with healthy fats, low sodium option'
+                };
+                meals.dinner = {
+                    name: 'Grilled fish with roasted vegetables',
+                    calories: 450,
+                    reason: 'Heart-healthy protein with fiber-rich vegetables'
+                };
+                meals.snack = {
+                    name: 'Carrot sticks with hummus',
+                    calories: 120,
+                    reason: 'Low-calorie, nutrient-dense snack'
+                };
+            }
+
+            // Foods to avoid based on health conditions
+            if (analysis.bloodPressure.status === 'high' || analysis.bloodPressure.status === 'elevated') {
+                foodsToAvoid.push('High-sodium processed foods (chips, canned soups, deli meats)');
+                foodsToAvoid.push('Excessive caffeine and energy drinks');
+            }
+            if (analysis.bloodSugar.status === 'high') {
+                foodsToAvoid.push('Refined sugars and sugary beverages');
+                foodsToAvoid.push('White bread, pasta, and other refined grains');
+            }
+            if (analysis.weight.status === 'overweight') {
+                foodsToAvoid.push('Fried foods and high-calorie snacks');
+                foodsToAvoid.push('Large portions and second helpings');
+            }
+
+            return { meals, foodsToAvoid };
+        }
+
+        // Initialize app
+        loadSavedData();
+        showSection(signupSection);
+
+        // --- Signup Form Logic ---
+        document.getElementById('signup-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            hideError('signup-error');
+
+            const fullName = document.getElementById('signup-fullname').value.trim();
+            const username = document.getElementById('signup-username').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const age = parseInt(document.getElementById('signup-age').value);
+            const gender = document.getElementById('signup-gender').value;
+
+            // Validation
+            if (!fullName || !username || !password || !age || !gender) {
+                showError('signup-error', 'Please fill in all fields.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('signup-error', 'Password must be at least 6 characters long.');
+                return;
+            }
+
+            if (age < 1 || age > 120) {
+                showError('signup-error', 'Please enter a valid age.');
+                return;
+            }
+
+            // Create user account
+            currentUser = { username, fullName, age, gender, password };
+            saveData();
+
+            // Pre-fill login form
+            document.getElementById('login-username').value = username;
+            document.getElementById('login-password').value = password;
+            
+            showSection(loginSection);
+            document.getElementById('signup-form').reset();
+        });
+
+        // Link to show login form from signup
+        document.getElementById('show-login-link').addEventListener('click', function(event) {
+            event.preventDefault();
+            showSection(loginSection);
+        });
+
+        // --- Login Form Logic ---
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            hideError('login-error');
+
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!username || !password) {
+                showError('login-error', 'Please enter both username and password.');
+                return;
+            }
+
+            // Check credentials
+            if (currentUser && currentUser.username === username && currentUser.password === password) {
+                welcomeMessage.textContent = `Welcome back, ${currentUser.fullName}! Ready to create your personalized meal plan?`;
+                showSection(dashboardSection);
+            } else {
+                showError('login-error', 'Invalid username or password. Please try again or sign up.');
+            }
+        });
+
+        // Link to show signup form from login
+        document.getElementById('show-signup-link').addEventListener('click', function(event) {
+            event.preventDefault();
+            showSection(signupSection);
+        });
+
+        // --- Health Form Logic ---
+        document.getElementById('health-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            hideError('health-error');
+            document.getElementById('medical-alert').classList.add('hidden');
+
+            const weight = parseFloat(document.getElementById('weight').value);
+            const systolic = parseInt(document.getElementById('bp-systolic').value);
+            const diastolic = parseInt(document.getElementById('bp-diastolic').value);
+            const bloodSugar = parseFloat(document.getElementById('blood-sugar').value);
+
+            // Validation
+            if (!weight || !systolic || !diastolic || !bloodSugar) {
+                showError('health-error', 'Please fill in all health metrics.');
+                return;
+            }
+
+            // Medical alert for dangerous readings
+            if (systolic >= 180 || diastolic >= 120 || bloodSugar >= 300) {
+                document.getElementById('medical-alert').classList.remove('hidden');
+                return;
+            }
+
+            showSection(processingSection);
+
+            // Simulate processing delay
+            setTimeout(() => {
+                // Analyze health metrics
+                const analysis = analyzeHealthMetrics(weight, systolic, diastolic, bloodSugar);
+                
+                // Generate meal plan
+                const mealPlan = generateMealPlan(analysis);
+
+                // Display health analysis
+                healthAnalysis.innerHTML = `
+                    <p><strong>Weight:</strong> ${analysis.weight.message}</p>
+                    <p><strong>Blood Pressure:</strong> ${analysis.bloodPressure.message}</p>
+                    <p><strong>Blood Sugar:</strong> ${analysis.bloodSugar.message}</p>
+                    <p><strong>Overall Risk Level:</strong> ${analysis.overallRisk.toUpperCase()}</p>
+                `;
+
+                // Display meal plan
+                mealDetails.innerHTML = Object.entries(mealPlan.meals).map(([meal, details]) => `
+                    <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                        <h4 class="text-lg font-semibold text-dark-blue">${meal.charAt(0).toUpperCase() + meal.slice(1)}</h4>
+                        <p class="text-sm text-light-blue-darker">${details.name} (${details.calories} kcal)</p>
+                        <p class="text-xs text-gray-600 mt-1">${details.reason}</p>
+                    </div>
+                `).join('');
+
+                // Display foods to avoid
+                foodsToAvoidList.innerHTML = mealPlan.foodsToAvoid.map(food => 
+                    `<li class="red-flag-emoji">${food}</li>`
+                ).join('');
+
+                showSection(mealPlanSection);
+                progressSection.classList.remove('hidden');
+            }, 3000);
+        });
+
+        // --- Save Plan Logic ---
+        document.getElementById('save-plan-btn').addEventListener('click', function() {
+            const planData = {
+                date: new Date().toISOString(),
+                user: currentUser.username,
+                healthMetrics: {
+                    weight: parseFloat(document.getElementById('weight').value),
+                    systolic: parseInt(document.getElementById('bp-systolic').value),
+                    diastolic: parseInt(document.getElementById('bp-diastolic').value),
+                    bloodSugar: parseFloat(document.getElementById('blood-sugar').value)
+                },
+                mealPlan: document.getElementById('meal-details').innerHTML,
+                foodsToAvoid: document.getElementById('foods-to-avoid').innerHTML
+            };
+
+            savedPlans.push(planData);
+            saveData();
+
+            alert('Meal plan saved successfully!');
+        });
+
+        // --- New Plan Logic ---
+        document.getElementById('new-plan-btn').addEventListener('click', function() {
+            showSection(dashboardSection);
+        });
+
+        // --- Logout Logic ---
+        logoutBtn.addEventListener('click', function() {
+            currentUser = null;
+            showSection(loginSection);
+            document.getElementById('login-form').reset();
+            document.getElementById('signup-form').reset();
+        });
+
+        // --- My Progress Button Logic ---
+        document.getElementById('my-progress-btn').addEventListener('click', function() {
+            if (savedPlans.length === 0) {
+                alert('No saved meal plans found. Generate and save a plan first!');
+                return;
+            }
+
+            const progressData = document.getElementById('progress-chart');
+            progressData.innerHTML = `
+                <div class="text-left w-full p-4">
+                    <h4 class="font-semibold mb-2">Saved Plans (${savedPlans.length})</h4>
+                    ${savedPlans.slice(-5).map(plan => `
+                        <div class="mb-2 p-2 bg-white rounded">
+                            <strong>${new Date(plan.date).toLocaleDateString()}</strong><br>
+                            Weight: ${plan.healthMetrics.weight}kg, BP: ${plan.healthMetrics.systolic}/${plan.healthMetrics.diastolic}, Sugar: ${plan.healthMetrics.bloodSugar}mg/dL
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        });
+
+        // --- Feedback Button Logic ---
+        document.getElementById('feedback-btn').addEventListener('click', function() {
+            const subject = encodeURIComponent("Feedback for FocusedEats App");
+            const body = encodeURIComponent(`Dear FocusedEats Team,\n\n[Your feedback here]\n\nSincerely,\n${currentUser ? currentUser.fullName : '[Your Name/Username]'}`);
+            window.location.href = `mailto:feedback@focusedeats.com?subject=${subject}&body=${body}`;
+        });
+    </script>
+</body>
+</html>

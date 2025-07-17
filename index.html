@@ -35,6 +35,64 @@
             box-shadow: 0 4px 6px -1px rgba(178, 235, 242, 0.5), 0 2px 4px -1px rgba(178, 235, 242, 0.3);
         }
 
+        /* Custom Button Styles for enhanced highlighting and hexagon shape */
+        .btn-base {
+            /* Common properties for all hexagon buttons */
+            width: 160px; /* Fixed width for consistent hexagon size */
+            height: 55px; /* Fixed height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            border-width: 2px; /* Solid border */
+            border-style: solid;
+            transition: all 0.3s ease-in-out; /* Smooth transitions for all properties */
+            font-size: 0.95em; /* Adjust font size to fit */
+            font-weight: 600;
+            text-align: center;
+            padding: 0; /* Remove default padding to let flex handle centering */
+        }
+
+        .btn-primary {
+            @apply btn-base; /* Inherit base properties */
+            background-color: #1A531A; /* Warm Dark Green */
+            color: white; /* White text */
+            border-color: #3D8C3D; /* Slightly lighter green border */
+            box-shadow: 0 4px 8px rgba(26, 83, 26, 0.4);
+        }
+        .btn-primary:hover {
+            background-color: #0F3A0F; /* Even darker green on hover */
+            border-color: #2D6B2D;
+            box-shadow: 0 6px 12px rgba(26, 83, 26, 0.5);
+            transform: translateY(-2px); /* More pronounced lift */
+        }
+        .btn-primary:active {
+            background-color: #517F51; /* Darkest green on click */
+            border-color: #1A531A;
+            box-shadow: 0 2px 4px rgba(26, 83, 26, 0.2);
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            @apply btn-base; /* Inherit base properties */
+            background-color: #B2EBF2; /* Medium Light Blue */
+            color: #00796B; /* Dark Teal text */
+            border-color: #81D4FA; /* Slightly darker light blue border */
+            box-shadow: 0 4px 8px rgba(178, 235, 242, 0.4);
+        }
+        .btn-secondary:hover {
+            background-color: #81D4FA; /* Darker blue on hover */
+            border-color: #4FC3F7;
+            box-shadow: 0 6px 12px rgba(178, 235, 242, 0.5);
+            transform: translateY(-2px);
+        }
+        .btn-secondary:active {
+            background-color: #4FC3F7; /* Even darker blue on click */
+            border-color: #B2EBF2;
+            box-shadow: 0 2px 4px rgba(178, 235, 242, 0.3);
+            transform: translateY(0);
+        }
+
         /* Spinning Plate Animation */
         .spinning-plate {
             width: 100px;
@@ -130,6 +188,11 @@
                 right: 1rem;
                 padding: 0.75rem;
             }
+            .btn-base {
+                width: 140px;
+                height: 50px;
+                font-size: 0.85em;
+            }
         }
     </style>
 </head>
@@ -141,26 +204,26 @@
     </button>
 
     <!-- Signup Section (Initially visible) -->
-    <div id="signup-section" class="bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-md w-full">
+    <div id="signup-section" class="bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-md w-full flex flex-col items-center">
         <h2 class="text-3xl font-bold text-center text-dark-blue mb-6">Create Your FocusedEats Account</h2>
-        <form id="signup-form" class="space-y-4">
-            <div>
+        <form id="signup-form" class="space-y-4 full flex flex-col items-center">
+            <div class="w-full">
                 <label for="signup-fullname" class="block text-sm font-medium text-light-blue-darker mb-1">Full Name</label>
                 <input type="text" id="signup-fullname" name="fullname" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Your full name" required>
             </div>
-            <div>
+            <div class="w-full">
                 <label for="signup-username" class="block text-sm font-medium text-light-blue-darker mb-1">Username</label>
                 <input type="text" id="signup-username" name="username" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Choose a username" required>
             </div>
-            <div>
+            <div class="w-full">
                 <label for="signup-password" class="block text-sm font-medium text-light-blue-darker mb-1">Password</label>
                 <input type="password" id="signup-password" name="password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Create a password" required minlength="6">
             </div>
-            <div>
+            <div class="w-full">
                 <label for="signup-age" class="block text-sm font-medium text-light-blue-darker mb-1">Age</label>
                 <input type="number" id="signup-age" name="age" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Your age" min="1" max="120" required>
             </div>
-            <div>
+            <div class="w-full">
                 <label for="signup-gender" class="block text-sm font-medium text-light-blue-darker mb-1">Gender</label>
                 <select id="signup-gender" name="gender" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" required>
                     <option value="">Select Gender</option>
@@ -169,39 +232,39 @@
                     <option value="Other">Other</option>
                 </select>
             </div>
-            <div id="signup-error" class="error-message hidden"></div>
-            <button type="submit" class="w-full bg-dark-blue text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-md">Sign Up</button>
-            <p class="text-center text-sm text-light-blue-darker">Already have an account? <a href="#" id="show-login-link" class="text-dark-blue hover:underline">Login here</a></p>
+            <div id="signup-error" class="error-message hidden w-full"></div>
+            <button type="submit" class="btn-primary">Sign Up</button>
+            <p class="text-center text-sm text-light-blue-darker mt-4">Already have an account? <a href="#" id="show-login-link" class="text-dark-blue hover:underline">Login here</a></p>
         </form>
     </div>
 
     <!-- Login Section (Hidden by default) -->
-    <div id="login-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-md w-full">
+    <div id="login-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-md w-full flex flex-col items-center">
         <h2 class="text-3xl font-bold text-center text-dark-blue mb-6">Welcome Back to FocusedEats!</h2>
-        <form id="login-form" class="space-y-4">
-            <div>
+        <form id="login-form" class="space-y-4 full flex flex-col items-center">
+            <div class="w-full">
                 <label for="login-username" class="block text-sm font-medium text-light-blue-darker mb-1">Username</label>
                 <input type="text" id="login-username" name="username" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Enter your username" required>
             </div>
-            <div>
+            <div class="w-full">
                 <label for="login-password" class="block text-sm font-medium text-light-blue-darker mb-1">Password</label>
                 <input type="password" id="login-password" name="password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-medium-blue focus:border-transparent transition duration-200" placeholder="Enter your password" required>
             </div>
-            <div class="flex items-center">
+            <div class="flex items-center w-full">
                 <input type="checkbox" id="remember-me" name="remember-me" class="h-4 w-4 text-dark-blue rounded focus:ring-dark-blue">
                 <label for="remember-me" class="ml-2 block text-sm text-light-blue-darker">Remember me</label>
             </div>
-            <div id="login-error" class="error-message hidden"></div>
-            <button type="submit" class="w-full bg-dark-blue text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-md">Login</button>
-            <p class="text-center text-sm text-light-blue-darker">Don't have an account? <a href="#" id="show-signup-link" class="text-dark-blue hover:underline">Sign up here</a></p>
+            <div id="login-error" class="error-message hidden w-full"></div>
+            <button type="submit" class="btn-primary">Login</button>
+            <p class="text-center text-sm text-light-blue-darker mt-4">Don't have an account? <a href="#" id="show-signup-link" class="text-dark-blue hover:underline">Sign up here</a></p>
         </form>
     </div>
 
     <!-- Dashboard Section (Hidden by default) -->
-    <div id="dashboard-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-2xl w-full">
+    <div id="dashboard-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-2xl w-full flex flex-col items-center">
         <h2 id="welcome-message" class="text-3xl font-bold text-center text-dark-blue mb-6">Welcome to FocusedEats! Ready to create your personalized meal plan?</h2>
 
-        <div class="space-y-6">
+        <div class="space-y-6 w-full">
             <div class="bg-light-blue p-4 rounded-lg shadow-sm">
                 <h3 class="text-xl font-semibold text-dark-blue mb-4">Morning Health Readings</h3>
                 <form id="health-form" class="space-y-4">
@@ -227,7 +290,9 @@
                     <div id="medical-alert" class="medical-alert hidden">
                         <strong>⚠️ Medical Alert:</strong> Your readings are outside normal ranges. Please consult a healthcare professional before proceeding.
                     </div>
-                    <button type="submit" id="generate-plan-btn" class="w-full bg-dark-blue text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-md">Generate Personalized Meal Plan</button>
+                    <div class="flex justify-center">
+                        <button type="submit" id="generate-plan-btn" class="btn-primary">Generate Personalized Meal Plan</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -242,47 +307,47 @@
     </div>
 
     <!-- Meal Plan Display Section (Hidden by default) -->
-    <div id="meal-plan-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-3xl w-full">
+    <div id="meal-plan-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-3xl w-full flex flex-col items-center">
         <h2 class="text-3xl font-bold text-center text-dark-blue mb-6">Your Personalized FocusedEats Meal Plan</h2>
 
-        <div id="health-summary" class="bg-light-blue p-4 rounded-lg mb-6">
+        <div id="health-summary" class="bg-light-blue p-4 rounded-lg mb-6 w-full">
             <h3 class="text-lg font-semibold text-dark-blue mb-2">Health Analysis Summary</h3>
             <div id="health-analysis" class="text-sm text-light-blue-darker">
                 <!-- Health analysis will be inserted here -->
             </div>
         </div>
 
-        <div id="meal-details" class="space-y-6 mb-8">
+        <div id="meal-details" class="space-y-6 mb-8 w-full">
             <!-- Meal details will be dynamically inserted here -->
         </div>
 
-        <div id="foods-to-avoid" class="bg-red-50 border border-red-200 p-4 rounded-lg shadow-sm">
+        <div id="foods-to-avoid" class="bg-red-50 border border-red-200 rounded-lg shadow-sm w-full">
             <h3 class="text-xl font-semibold text-red-700 mb-3">Foods to Avoid Today</h3>
-            <ul class="list-disc pl-5 space-y-2 text-red-600">
+            <ul class="list-disc pl-5 space-y-2">
                 <!-- Foods to avoid will be dynamically inserted here -->
             </ul>
         </div>
 
-        <div class="mt-6 flex gap-4">
+        <div class="mt-6 flex gap-4 w-full">
             <button id="save-plan-btn" class="flex-1 bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300 shadow-md">Save This Plan</button>
             <button id="new-plan-btn" class="flex-1 bg-dark-blue text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-md">Generate New Plan</button>
         </div>
     </div>
 
     <!-- Weekly Progress Section (Hidden by default, accessible via button) -->
-    <div id="progress-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-3xl w-full mt-4">
+    <div id="progress-section" class="hidden bg-white p-8 rounded-xl shadow-lg border border-light-blue max-w-3xl w-full mt-4 flex flex-col items-center">
         <h2 class="text-3xl font-bold text-center text-dark-blue mb-6">Your Weekly Progress Report</h2>
-        <div id="progress-data" class="bg-light-blue p-4 rounded-lg text-center text-light-blue-darker">
+        <div id="progress-data" class="bg-light-blue p-4 rounded-lg text-center text-light-blue-darker w-full">
             <p class="mb-2">Your saved meal plans and health trends:</p>
             <div id="progress-chart" class="w-full h-48 bg-gray-200 rounded-md flex items-center justify-center text-gray-500">
                 [Progress data will be displayed here]
             </div>
         </div>
-        <button id="my-progress-btn" class="mt-6 w-full bg-dark-blue text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition duration-300 shadow-md">View All Saved Plans</button>
+        <button id="my-progress-btn" class="btn-primary mt-6">View All Saved Plans</button>
     </div>
 
     <!-- Feedback Button (Always visible at the bottom) -->
-    <button id="feedback-btn" class="fixed bottom-4 right-4 bg-medium-blue text-dark-blue p-4 rounded-full shadow-lg hover:bg-blue-300 transition duration-300 flex items-center justify-center text-sm font-semibold">
+    <button id="feedback-btn" class="fixed bottom-4 right-4 btn-secondary rounded-full p-4">
         Feedback
     </button>
 
@@ -303,6 +368,95 @@
         // User data storage with localStorage
         let currentUser = null;
         let savedPlans = [];
+        let currentDay = 0; // Simulate day count for meal variety
+
+        // Sample meal plans for demonstration of variety
+        const mealPlanSet1 = `
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Breakfast</h4>
+                <p class="text-sm text-light-blue-darker">Oatmeal with berries and nuts (350 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: High in fiber, good source of antioxidants. Educational Reason: Helps maintain stable blood sugar levels and provides sustained energy.</p>
+            </div>
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Lunch</h4>
+                <p class="text-sm text-light-blue-darker">Grilled chicken salad with mixed greens, cucumber, tomatoes, and olive oil vinaigrette (450 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: Lean protein, rich in vitamins and minerals. Educational Reason: Supports muscle health and provides essential nutrients without spiking blood pressure.</p>
+            </div>
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Dinner</h4>
+                <p class="text-sm text-light-blue-darker">Baked salmon with steamed asparagus and quinoa (550 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: Excellent source of Omega-3 fatty acids, complex carbohydrates. Educational Reason: Omega-3are beneficial for heart health and blood pressure regulation.</p>
+            </div>
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Snack</h4>
+                <p class="text-sm text-light-blue-darker">Apple slices with a small handful of almonds (150 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: Fiber-rich, healthy fats. Educational Reason: A balanced snack that helps curb cravings and provides sustained energy.</p>
+            </div>
+        `;
+
+        const mealPlanSet2 = `
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Breakfast</h4>
+                <p class="text-sm text-light-blue-darker">Greek yogurt with granola and blueberries (300 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: High in protein, good source of probiotics. Educational Reason: Promotes gut health and provides a steady release of energy.</p>
+            </div>
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Lunch</h4>
+                <p class="text-sm text-light-blue-darker">Lentil soup with whole-grain bread (400 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: Rich in plant-based protein and fiber. Educational Reason: Excellent for digestive health and helps manage blood sugar levels.</p>
+            </div>
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Dinner</h4>
+                <p class="text-sm text-light-blue-darker">Chicken stir-fry with broccoli, bell peppers, and brown rice (500 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: Balanced meal with lean protein and diverse vegetables. Educational Reason: Provides a wide range of vitamins and minerals crucial for overall well-being.</p>
+            </div>
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Snack</h4>
+                <p class="text-sm text-light-blue-darker">Carrot sticks with hummus (120 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: Fiber-rich, healthy fats. Educational Reason: A satisfying and nutritious snack that supports healthy digestion.</p>
+            </div>
+        `;
+
+        const mealPlanSet3 = `
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Breakfast</h4>
+                <p class="text-sm text-light-blue-darker">Scrambled eggs with spinach and a slice of whole-wheat toast (380 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: High in protein, good source of iron. Educational Reason: Provides sustained energy and supports muscle repair.</p>
+            </div>
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Lunch</h4>
+                <p class="text-sm text-light-blue-darker">Quinoa salad with chickpeas, cucumber, cherry tomatoes, and lemon-tahini dressing (470 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: Plant-based protein, complex carbs, and healthy fats. Educational Reason: A complete vegetarian meal that helps regulate blood sugar.</p>
+            </div>
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Dinner</h4>
+                <p class="text-sm text-light-blue-darker">Turkey meatballs with zucchini noodles and marinara sauce (520 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: Lean protein, low-carb vegetable base. Educational Reason: A lighter dinner option that supports weight management and healthy blood pressure.</p>
+            </div>
+            <div class="bg-light-blue p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-semibold text-dark-blue">Snack</h4>
+                <p class="text-sm text-light-blue-darker">A small banana (100 kcal)</p>
+                <p class="text-xs text-gray-600 mt-1">Nutritional Summary: Quick energy, potassium. Educational Reason: Replenishes electrolytes and provides a natural energy boost.</p>
+            </div>
+        `;
+
+        const foodsToAvoidSet1 = `
+            <li class="red-flag-emoji">Highly processed foods (e.g., fast food, packaged snacks) - Reason: High in sodium and unhealthy fats, which can elevate blood pressure.</li>
+            <li class="red-flag-emoji">Sugary beverages (e.g., soda, sweetened juices) - Reason: Can cause rapid spikes in blood sugar levels.</li>
+            <li class="red-flag-emoji">Excessive red meat - Reason: May contribute to higher cholesterol and blood pressure if consumed in large quantities.</li>
+        `;
+
+        const foodsToAvoidSet2 = `
+            <li class="red-flag-emoji">Deep-fried foods - Reason: High in unhealthy trans fats, detrimental to heart health and blood pressure.</li>
+            <li class="red-flag-emoji">White bread and refined grains - Reason: Can cause quick blood sugar spikes due to lack of fiber.</li>
+            <li class="red-flag-emoji">High-sodium canned soups - Reason: Excessive sodium intake directly impacts blood pressure.</li>
+        `;
+
+        const foodsToAvoidSet3 = `
+            <li class="red-flag-emoji">Artificially sweetened desserts - Reason: Can disrupt gut microbiome and potentially affect blood sugar regulation.</li>
+            <li class="red-flag-emoji">Full-fat dairy products (if high cholesterol is a concern) - Reason: Can contribute to saturated fat intake.</li>
+            <li class="red-flag-emoji">Excessive caffeine - Reason: May temporarily elevate blood pressure in some individuals.</li>
+        `;
 
         // Load saved data from localStorage
         function loadSavedData() {
@@ -587,9 +741,6 @@
                 // Analyze health metrics
                 const analysis = analyzeHealthMetrics(weight, systolic, diastolic, bloodSugar);
                 
-                // Generate meal plan
-                const mealPlan = generateMealPlan(analysis);
-
                 // Display health analysis
                 healthAnalysis.innerHTML = `
                     <p><strong>Weight:</strong> ${analysis.weight.message}</p>
@@ -598,19 +749,22 @@
                     <p><strong>Overall Risk Level:</strong> ${analysis.overallRisk.toUpperCase()}</p>
                 `;
 
-                // Display meal plan
-                mealDetails.innerHTML = Object.entries(mealPlan.meals).map(([meal, details]) => `
-                    <div class="bg-light-blue p-4 rounded-lg shadow-sm">
-                        <h4 class="text-lg font-semibold text-dark-blue">${meal.charAt(0).toUpperCase() + meal.slice(1)}</h4>
-                        <p class="text-sm text-light-blue-darker">${details.name} (${details.calories} kcal)</p>
-                        <p class="text-xs text-gray-600 mt-1">${details.reason}</p>
-                    </div>
-                `).join('');
+                // Simulate meal plan variety based on currentDay
+                currentDay = (currentDay % 5) + 1; // Cycle through days 1 to5               let selectedMealPlanSet;
+                let selectedFoodsToAvoidSet;
 
-                // Display foods to avoid
-                foodsToAvoidList.innerHTML = mealPlan.foodsToAvoid.map(food => 
-                    `<li class="red-flag-emoji">${food}</li>`
-                ).join('');
+                if (currentDay <= 3) {
+                    selectedMealPlanSet = mealPlanSet1;
+                    selectedFoodsToAvoidSet = foodsToAvoidSet1
+                } else if (currentDay === 4) {
+                    selectedMealPlanSet = mealPlanSet2;
+                    selectedFoodsToAvoidSet = foodsToAvoidSet2
+                } else { // currentDay === 5
+                    selectedMealPlanSet = mealPlanSet3;
+                    selectedFoodsToAvoidSet = foodsToAvoidSet3               }
+
+                mealDetails.innerHTML = selectedMealPlanSet;
+                foodsToAvoidList.innerHTML = selectedFoodsToAvoidSet;
 
                 showSection(mealPlanSection);
                 progressSection.classList.remove('hidden');
@@ -646,6 +800,7 @@
         // --- Logout Logic ---
         logoutBtn.addEventListener('click', function() {
             currentUser = null;
+            currentDay = 0; // Reset day count on logout
             showSection(loginSection);
             document.getElementById('login-form').reset();
             document.getElementById('signup-form').reset();

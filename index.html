@@ -4,9 +4,214 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FOCUSED EATS</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase configuration (provided by the Canvas environment)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let currentUserId = null;
+        let isAuthReady = false; // Flag to ensure auth state is known before Firestore ops
+
+        // Authenticate user
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                // Display user ID and verification status
+                document.getElementById('userIdDisplay').textContent = `User ID: ${user.uid} (${user.emailVerified ? 'Verified' : 'Unverified'})`;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('appSection').classList.remove('hidden');
+                isAuthReady = true;
+                console.log("Firebase authenticated. User ID:", currentUserId);
+                loadHistoricalData(); // Load data once authenticated
+            } else {
+                currentUserId = null;
+                document.getElementById('userIdDisplay').textContent = `User ID: Not Logged In`;
+                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('appSection').classList.add('hidden');
+                isAuthReady = true; // Auth state is known, even if not logged in
+                console.log("Firebase not authenticated.");
+            }
+        });
+
+        // Make Firebase instances and userId available globally for the main script
+        window.firebaseApp = app;
+        window.firestoreDb = db;
+        window.firebaseAuth = auth;
+        window.getUserId = () => currentUserId;
+        window.isFirebaseAuthReady = () => isAuthReady;
+        window.getAppId = () => appId; // Expose appId
+
+        // Function to save metrics to Firestore
+        window.saveMetricsToFirestore = async (metrics, recommendations) => {
+            if (!window.isFirebaseAuthReady() || !window.getUserId()) {
+                console.warn("Firebase not ready or user not authenticated. Cannot save metrics.");
+                return;
+            }
+            try {
+                const metricsCollectionRef = collection(window.firestoreDb, `artifacts/${window.getAppId()}/users/${window.getUserId()}/metrics`);
+                await addDoc(metricsCollectionRef, {
+                    ...metrics,
+                    recommendations: recommendations,
+                    timestamp: new Date()
+                });
+                console.log("Metrics saved to Firestore!");
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+        };
+
+        // Function to load historical data from Firestore
+        function loadHistoricalData() {
+            if (!window.isFirebaseAuthReady() || !window.getUserId()) {
+                console.warn("Firebase not ready or user not authenticated. Cannot load historical data.");
+                return;
+            }
+
+            const historicalDataList = document.getElementById('historicalDataList');
+            const metricsCollectionRef = collection(window.firestoreDb, `artifacts/${window.getAppId()}/users/${window.getUserId()}/metrics`);
+            const q = query(metricsCollectionRef, orderBy("timestamp", "desc"));
+
+            onSnapshot(q, (snapshot) => {
+                historicalDataList.innerHTML = ''; // Clear previous data
+                if (snapshot.empty) {
+                    historicalDataList.innerHTML = '<li class="text-gray-500">No historical data found.</li>';
+                    return;
+                }
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const li = document.createElement('li');
+                    li.className = 'bg-white p-3 rounded-lg border border-gray-200 flex flex-col gap-1';
+                    const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A';
+                    li.innerHTML = `
+                        <span class="font-semibold text-gray-800">${date}</span>
+                        <span class="text-sm text-gray-600">BP: ${data.systolic}/${data.diastolic} mmHg | Sugar: ${data.sugar} mg/dL | Weight: ${data.weight} kg</span>
+                        <div class="text-sm mt-1">
+                            <p class="font-medium text-green-700">Eat: ${data.recommendations.eat.join(', ')}</p>
+                            <p class="font-medium text-red-700">Avoid: ${data.recommendations.avoid.join(', ')}</p>
+                        </div>
+                    `;
+                    historicalDataList.appendChild(li);
+                });
+            }, (error) => {
+                console.error("Error loading historical data:", error);
+                historicalDataList.innerHTML = '<li class="text-red-500">Error loading data.</li>';
+            });
+        }
+
+        // Expose sign-out function globally for the logout button
+        window.handleSignOut = async () => {
+            try {
+                await signOut(auth);
+                console.log("User signed out.");
+                // UI will be handled by onAuthStateChanged listener
+            } catch (error) {
+                console.error("Error signing out:", error);
+            }
+        };
+
+        // Handle Email/Password Auth with validation
+        window.handleAuth = async (isSignUp) => {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const authMessage = document.getElementById('authMessage');
+            authMessage.textContent = ''; // Clear previous messages
+
+            // --- Validation Checks ---
+            // Email (Username) validation: only allow standard email characters, no emojis
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(email)) {
+                authMessage.textContent = 'Invalid email format or contains disallowed characters.';
+                return;
+            }
+            // Check for emojis in email (more robust check, as regex above might not catch all unicode emojis)
+            const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
+            if (emojiRegex.test(email)) {
+                authMessage.textContent = 'Email cannot contain emojis.';
+                return;
+            }
+
+            // Password length validation
+            if (password.length > 12) {
+                authMessage.textContent = 'Password cannot exceed 12 characters.';
+                return;
+            }
+            // Password character validation: allow alphanumeric and common symbols, no emojis
+            const passwordCharRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]+$/;
+            if (!passwordCharRegex.test(password)) {
+                authMessage.textContent = 'Password contains disallowed characters (emojis or unusual symbols).';
+                return;
+            }
+
+            // --- Firebase Authentication ---
+            try {
+                if (isSignUp) {
+                    const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+                    await sendEmailVerification(userCredential.user);
+                    authMessage.textContent = 'Account created! A verification email has been sent. Please check your inbox.';
+                    // User is automatically logged in after creation, onAuthStateChanged will handle UI switch
+                } else {
+                    const userCredential = await signInWithEmailAndPassword(window.firebaseAuth, email, password);
+                    authMessage.textContent = 'Signed in successfully!';
+                    // User is logged in, onAuthStateChanged will handle UI switch
+                }
+            } catch (error) {
+                let errorMessage = 'Authentication Error: ';
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage += 'This email is already registered. Try signing in or use a different email.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage += 'Invalid email address.';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        errorMessage += 'Email/password authentication is not enabled. (Please enable in Firebase Console)';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage += 'Password is too weak. (Firebase requires at least 6 characters)';
+                        break;
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage += 'Invalid email or password.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                authMessage.textContent = errorMessage;
+                console.error("Auth error:", error);
+            }
+        };
+
+        window.signInAnonymouslyDemo = async () => {
+            const authMessage = document.getElementById('authMessage');
+            authMessage.textContent = ''; // Clear previous messages
+            try {
+                await signInAnonymously(window.firebaseAuth);
+                authMessage.textContent = 'Signed in anonymously!';
+            } catch (error) {
+                authMessage.textContent = `Anonymous Sign-in Error: ${error.message}`;
+                console.error("Anonymous sign-in failed:", error);
+            }
+        };
+
+        // Initial sign-in attempt on page load
+        // This is handled by the onAuthStateChanged listener in the head script.
+        // It will automatically sign in anonymously if no user is found and no custom token is present.
+        // No explicit call needed here.
+
+    </script>
     <style>
         body {
             font-family: 'Inter', sans-serif;

@@ -36,6 +36,8 @@
                 isAuthReady = true;
                 console.log("Firebase authenticated. User ID:", currentUserId);
                 loadHistoricalData(); // Load data once authenticated
+                loadSavedPlans(); // Load saved plans once authenticated
+                showTab('evaluator'); // Show evaluator tab by default on login
             } else {
                 currentUserId = null;
                 document.getElementById('userIdDisplay').textContent = `User ID: Not Logged In`;
@@ -70,6 +72,30 @@
                 console.log("Metrics saved to Firestore!");
             } catch (e) {
                 console.error("Error adding document: ", e);
+            }
+        };
+
+        // Function to save a plan to Firestore
+        window.savePlanToFirestore = async (planName, metrics, recommendations) => {
+            if (!window.isFirebaseAuthReady() || !window.getUserId()) {
+                console.warn("Firebase not ready or user not authenticated. Cannot save plan.");
+                return;
+            }
+            if (!planName || planName.trim() === '') {
+                console.warn("Plan name cannot be empty.");
+                return;
+            }
+            try {
+                const plansCollectionRef = collection(window.firestoreDb, `artifacts/${window.getAppId()}/users/${window.getUserId()}/plans`);
+                await addDoc(plansCollectionRef, {
+                    plan_name: planName,
+                    metrics: metrics,
+                    recommendations: recommendations,
+                    timestamp: new Date()
+                });
+                console.log("Plan saved to Firestore!");
+            } catch (e) {
+                console.error("Error adding plan document: ", e);
             }
         };
 
@@ -108,6 +134,45 @@
             }, (error) => {
                 console.error("Error loading historical data:", error);
                 historicalDataList.innerHTML = '<li class="text-red-500">Error loading data.</li>';
+            });
+        }
+
+        // Function to load saved plans from Firestore
+        function loadSavedPlans() {
+            if (!window.isFirebaseAuthReady() || !window.getUserId()) {
+                console.warn("Firebase not ready or user not authenticated. Cannot load saved plans.");
+                return;
+            }
+
+            const savedPlansList = document.getElementById('savedPlansList');
+            const plansCollectionRef = collection(window.firestoreDb, `artifacts/${window.getAppId()}/users/${window.getUserId()}/plans`);
+            const q = query(plansCollectionRef, orderBy("timestamp", "desc"));
+
+            onSnapshot(q, (snapshot) => {
+                savedPlansList.innerHTML = ''; // Clear previous data
+                if (snapshot.empty) {
+                    savedPlansList.innerHTML = '<li class="text-gray-500">No saved plans found.</li>';
+                    return;
+                }
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const li = document.createElement('li');
+                    li.className = 'bg-white p-3 rounded-lg border border-gray-200 flex flex-col gap-1';
+                    const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A';
+                    li.innerHTML = `
+                        <span class="font-bold text-lg text-blue-700">${data.plan_name}</span>
+                        <span class="font-semibold text-gray-800">${date}</span>
+                        <span class="text-sm text-gray-600">BP: ${data.metrics.systolic}/${data.metrics.diastolic} mmHg | Sugar: ${data.metrics.sugar} mg/dL | Weight: ${data.metrics.weight} kg</span>
+                        <div class="text-sm mt-1">
+                            <p class="font-medium text-green-700">Eat: ${data.recommendations.eat.join(', ')}</p>
+                            <p class="font-medium text-red-700">Avoid: ${data.recommendations.avoid.join(', ')}</p>
+                        </div>
+                    `;
+                    savedPlansList.appendChild(li);
+                });
+            }, (error) => {
+                console.error("Error loading saved plans:", error);
+                savedPlansList.innerHTML = '<li class="text-red-500">Error loading data.</li>';
             });
         }
 
@@ -569,6 +634,7 @@
         const foodsToAvoidList = document.querySelector('#foods-to-avoid ul');
         const logoutBtn = document.getElementById('logout-btn');
         const healthAnalysis = document.getElementById('health-analysis');
+        const savedPlansList = document.getElementById('savedPlansList'); // Added for saved plans
 
         // User data storage with localStorage
         let currentUser = null;
@@ -978,9 +1044,16 @@
 
         // --- Save Plan Logic ---
         document.getElementById('save-plan-btn').addEventListener('click', function() {
+            const planName = prompt('Enter a name for your meal plan:');
+            if (!planName || planName.trim() === '') {
+                alert('Plan name cannot be empty. Please try again.');
+                return;
+            }
+
             const planData = {
                 date: new Date().toISOString(),
                 user: currentUser.username,
+                plan_name: planName, // Add plan name to the data
                 healthMetrics: {
                     weight: parseFloat(document.getElementById('weight').value),
                     systolic: parseInt(document.getElementById('bp-systolic').value),
@@ -991,10 +1064,17 @@
                 foodsToAvoid: document.getElementById('foods-to-avoid').innerHTML
             };
 
-            savedPlans.push(planData);
-            saveData();
-
-            alert('Meal plan saved successfully!');
+            // Save to Firestore
+            window.savePlanToFirestore(planName, planData.healthMetrics, {
+                eat: [], // Placeholder, will be populated by meal generation
+                avoid: [] // Placeholder, will be populated by meal generation
+            }).then(() => {
+                alert('Meal plan saved successfully!');
+                loadSavedPlans(); // Reload saved plans to show the new one
+            }).catch(error => {
+                console.error("Error saving plan to Firestore:", error);
+                alert('Failed to save meal plan. Please try again.');
+            });
         });
 
         // --- New Plan Logic ---
